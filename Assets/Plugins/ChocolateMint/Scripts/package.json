@@ -1,0 +1,9 @@
+{
+    "name": "com.takumyon.chocolate-mint",
+    "displayName": "ChocolateMint",
+    "version": "1.0.0",
+    "unity": "2019.4",
+    "description": "Unity Game Library.",
+    "license": "takumyon",
+    "dependencies": {}
+}
