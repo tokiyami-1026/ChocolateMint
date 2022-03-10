@@ -26,6 +26,22 @@ namespace ChocolateMint.Service
         }
 
         /// <summary>
+        /// サービスの登録（パラメータ付き）
+        /// </summary>
+        /// <typeparam name="TService">登録するサービスタイプ</typeparam>
+        /// <typeparam name="TParameter">サービスに渡すパラメータタイプ</typeparam>
+        /// <param name="parameter">サービスに渡すパラメータ</param>
+        static public void RegisterService<TService, TParameter>(TParameter parameter) where TService : ServiceBase, IServiceParameter<TParameter>, new()
+        {
+            var service = new TService();
+            service.PreStartup(parameter);
+            services.Add(typeof(TService), service);
+
+            // 登録されたサービスの開始処理をたたく
+            service.Startup();
+        }
+
+        /// <summary>
         /// サービスの取得
         /// </summary>
         static public TService GetService<TService>() where TService : ServiceBase
