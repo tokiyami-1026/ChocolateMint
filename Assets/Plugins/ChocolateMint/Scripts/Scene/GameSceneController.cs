@@ -8,7 +8,7 @@ using UnityScene = UnityEngine.SceneManagement.Scene;
 namespace ChocolateMint.Scene
 {
     public abstract class GameSceneController<TModel, TView> : DisplayContentController<TModel, TView>, IDisplayContentLoadingCallbackReceiverInternal<UnityScene>
-        where TModel : DisplayContentModel, new()
+        where TModel : DisplayContentModel,new()
         where TView : DisplayContentView
     {
         /// <summary>

@@ -5,7 +5,7 @@ using UniRx;
 
 namespace ChocolateMint.Common
 {
-    public abstract class DisplayContentView : MonoBehaviour
+    public class DisplayContentView : MonoBehaviour
     {
         protected IMessagePublisher messagePublisher = default;
 

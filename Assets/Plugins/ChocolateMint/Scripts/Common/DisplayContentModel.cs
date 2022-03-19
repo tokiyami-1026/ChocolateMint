@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ChocolateMint.Common
 {
-    public abstract class DisplayContentModel
+    public class DisplayContentModel
     {
         /// <summary>
         /// 初期化
