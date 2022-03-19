@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using ChocolateMint.Common;
 
 namespace ChocolateMint.Service
 {
     /// <summary>
     /// サービス管理クラス
     /// </summary>
-    static public class ServiceManager
+    public class ServiceManager : IUpdateHandler
     {
         /// <summary>
         /// 全サービス
@@ -16,7 +17,7 @@ namespace ChocolateMint.Service
         /// <summary>
         /// サービスの登録
         /// </summary>
-        static public void RegisterService<TService>() where TService : ServiceBase, new()
+        public void RegisterService<TService>() where TService : ServiceBase, new()
         {
             var service = new TService();
             services.Add(typeof(TService), service);
@@ -31,7 +32,7 @@ namespace ChocolateMint.Service
         /// <typeparam name="TService">登録するサービスタイプ</typeparam>
         /// <typeparam name="TParameter">サービスに渡すパラメータタイプ</typeparam>
         /// <param name="parameter">サービスに渡すパラメータ</param>
-        static public void RegisterService<TService, TParameter>(TParameter parameter) where TService : ServiceBase, IServiceParameter<TParameter>, new()
+        public void RegisterService<TService, TParameter>(TParameter parameter) where TService : ServiceBase, IServiceParameter<TParameter>, new()
         {
             var service = new TService();
             service.PreStartup(parameter);
@@ -47,6 +48,17 @@ namespace ChocolateMint.Service
         static public TService GetService<TService>() where TService : ServiceBase
         {
             return (TService)services[typeof(TService)];
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        public void Update()
+        {
+            foreach (var service in services.Values)
+            {
+                ((IUpdateHandler)service).Update();
+            }
         }
 
         /// <summary>
