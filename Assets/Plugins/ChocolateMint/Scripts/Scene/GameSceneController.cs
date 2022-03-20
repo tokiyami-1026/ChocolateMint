@@ -7,7 +7,7 @@ using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace ChocolateMint.Scene
 {
-    public abstract class GameSceneController<TModel, TView> : DisplayContentController<TModel, TView>, IDisplayContentLoadingCallbackReceiverInternal<UnityScene>
+    public abstract class GameSceneController<TModel, TView> : DisplayContentController<TModel, TView>, IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>
         where TModel : DisplayContentModel,new()
         where TView : DisplayContentView
     {
@@ -15,7 +15,7 @@ namespace ChocolateMint.Scene
         /// ロードが完了した
         /// </summary>
         /// <param name="loadResult">ロードが完了したUnityのシーン</param>
-        void IDisplayContentLoadingCallbackReceiverInternal<UnityScene>.OnLoadedInternal(UnityScene loadedScene)
+        DisplayContentView IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>.OnLoadedInternal(UnityScene loadedScene)
         {
             Initialize();
             Model.Initialize();
@@ -34,6 +34,8 @@ namespace ChocolateMint.Scene
             {
                 view.InitializeInternal(MessageBroker);
                 view.Initialize();
+
+                return view;
             }
             else
             {

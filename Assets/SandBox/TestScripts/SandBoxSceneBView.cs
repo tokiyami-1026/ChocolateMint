@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ChocolateMint.Common;
+using ChocolateMint.Scene;
 
-public class SandBoxSceneModel : DisplayContentModel
+public class SandBoxSceneBView : DisplayContentView
 {
-    
+
 }

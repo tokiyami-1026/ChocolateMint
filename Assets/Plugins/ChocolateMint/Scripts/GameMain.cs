@@ -2,6 +2,8 @@
 using ChocolateMint.Service;
 using ChocolateMint.Scene;
 using ChocolateMint.Common;
+using UnityScene = UnityEngine.SceneManagement.Scene;
+using System;
 
 namespace ChocolateMint
 {
@@ -16,10 +18,11 @@ namespace ChocolateMint
         /// <summary>
         /// 起動する
         /// </summary>
-        public void Run()
+        public void Run<TStartGameScene>()
+            where TStartGameScene : DisplayContent, IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>, new()
         {
             // 各種サービスを登録
-            ServiceManager.RegisterService<GameSceneTransitionService>();
+            ServiceManager.RegisterService<GameSceneTransitionService,Type>(typeof(TStartGameScene));
 
             // CommonUpdater
             var commonUpdaterObject = new GameObject(typeof(CommonUpdater).Name);

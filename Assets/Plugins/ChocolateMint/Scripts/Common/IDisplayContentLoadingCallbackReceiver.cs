@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace ChocolateMint.Common
 {
-    public interface IDisplayContentLoadingCallbackReceiverInternal<LoadResult>
+    public interface IDisplayContentLoadingCallbackReceiverInternal<LoadResult,TOnLoadedResult>
     {
         /// <summary>
         /// ロード完了
         /// </summary>
-        void OnLoadedInternal(LoadResult loadResult);
+        TOnLoadedResult OnLoadedInternal(LoadResult loadResult);
     }
 }

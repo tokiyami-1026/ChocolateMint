@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ChocolateMint.Common;
 
-public class SandBoxSceneView : DisplayContentView
+public class SandBoxSceneBModel : DisplayContentModel
 {
     
 }

@@ -12,7 +12,7 @@ public class MyGameMain
     private static void Main()
     {
         // ライブラリを起動する
-        GameMain.Run();
+        GameMain.Run<SandBoxSceneA>();
 
         // ゲーム終了時のコールバックを登録しておく
         Application.quitting += OnQuitGame;

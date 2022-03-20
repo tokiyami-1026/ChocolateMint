@@ -2,11 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
+using UnityEngine.Playables;
 
 namespace ChocolateMint.Common
 {
-    public class DisplayContentView : MonoBehaviour
+    public abstract class DisplayContentView : MonoBehaviour, IDisplayContentTransitionAnimation
     {
+        /// <summary>
+        /// シーン遷移で入ってきた場合のアニメーション
+        /// </summary>
+        [SerializeField]
+        private PlayableDirector transitionAnimEnter = default;
+        PlayableDirector IDisplayContentTransitionAnimation.TransitionAnimEnter => transitionAnimEnter;
+
+        /// <summary>
+        /// シーン遷移で別のシーンに移動するときのアニメーション
+        /// </summary>
+        [SerializeField]
+        private PlayableDirector transitionAnimExit = default;
+        PlayableDirector IDisplayContentTransitionAnimation.TransitionAnimExit => transitionAnimExit;
+
+        /// <summary>
+        /// MessagePublisher
+        /// </summary>
         protected IMessagePublisher messagePublisher = default;
 
         /// <summary>
