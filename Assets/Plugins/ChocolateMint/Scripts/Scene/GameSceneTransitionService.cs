@@ -134,6 +134,7 @@ namespace ChocolateMint.Scene
             if (enterAnim != null)
             {
                 await PlayTransitionAnim(enterAnim);
+                enterAnim.gameObject.SetActive(false);
             }
 
             isTransitioning = false;
