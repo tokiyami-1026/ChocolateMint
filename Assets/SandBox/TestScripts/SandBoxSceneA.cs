@@ -7,4 +7,9 @@ using ChocolateMint.Scene;
 public class SandBoxSceneA : GameSceneController<DisplayContentModel, SandBoxSceneAView>
 {
     public override string ContentAssetPath => "Assets/SandBox/Scenes/SandBoxSceneA.unity";
+
+    public override void Terminate()
+    {
+        Debug.Log("Terminate");
+    }
 }

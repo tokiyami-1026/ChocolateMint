@@ -36,14 +36,24 @@ namespace ChocolateMint.Scene
         }
 
         /// <summary>
+        /// GameSceneとSceneViewのセット
+        /// </summary>
+        private class GameSceneSet
+        {
+            public DisplayContent gameScene;
+
+            public DisplayContentView gameSceneView;
+        }
+
+        /// <summary>
         /// 遷移待ちのパラメータキュー
         /// </summary>
         private Queue<TransitionParameter> transitionQueueParameters = new Queue<TransitionParameter>();
 
         /// <summary>
-        /// 現在のシーンビュー
+        /// 現在アクティブなシーン
         /// </summary>
-        private DisplayContentView currentSceneView;
+        private GameSceneSet currentActiveScene;
 
         /// <summary>
         /// 遷移中かどうか
@@ -70,9 +80,13 @@ namespace ChocolateMint.Scene
         public override void Startup()
         {
             // ゲーム開始時のシーンのインスタンスを作る
-            var startGameScene = Activator.CreateInstance(startGameSceneType);
+            var startGameScene = (DisplayContent)Activator.CreateInstance(startGameSceneType);
             var activeUnityScene = SceneManager.GetActiveScene();
-            currentSceneView = ((IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>)startGameScene).OnLoadedInternal(activeUnityScene);
+            currentActiveScene = new GameSceneSet()
+            {
+                gameScene = startGameScene,
+                gameSceneView = ((IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>)startGameScene).OnLoadedInternal(activeUnityScene),
+            };
         }
 
         /// <summary>
@@ -113,11 +127,14 @@ namespace ChocolateMint.Scene
         private async UniTask TransitionGameSceneInternal(TransitionParameter parameter)
         {
             // 遷移開始アニメーション
-            var animExit = ((IDisplayContentTransitionAnimation)currentSceneView)?.TransitionAnimExit;
+            var animExit = ((IDisplayContentTransitionAnimation)currentActiveScene.gameSceneView)?.TransitionAnimExit;
             if (animExit != null)
             {
                 await PlayTransitionAnim(animExit);
             }
+
+            // 現在のシーンの終了処理を呼ぶ
+            currentActiveScene.gameScene.Terminate();
 
             // 指定シーンへ遷移する
             var loadScene = parameter.gameScene;
@@ -127,10 +144,14 @@ namespace ChocolateMint.Scene
             // ロード完了
             parameter.preInitializeWithSceneParameter?.Invoke();
             var view = ((IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>)loadScene).OnLoadedInternal(activeScene);
-            currentSceneView = view;
+            currentActiveScene = new GameSceneSet()
+            {
+                gameScene = loadScene,
+                gameSceneView = view,
+            };
 
             // 遷移終了アニメーション
-            var enterAnim = ((IDisplayContentTransitionAnimation)currentSceneView)?.TransitionAnimEnter;
+            var enterAnim = ((IDisplayContentTransitionAnimation)currentActiveScene.gameSceneView)?.TransitionAnimEnter;
             if (enterAnim != null)
             {
                 await PlayTransitionAnim(enterAnim);
