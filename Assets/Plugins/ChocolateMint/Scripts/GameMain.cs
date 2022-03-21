@@ -22,7 +22,7 @@ namespace ChocolateMint
             where TStartGameScene : DisplayContent, IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>, new()
         {
             // 各種サービスを登録
-            ServiceManager.RegisterService<GameSceneTransitionService,Type>(typeof(TStartGameScene));
+            ServiceManager.RegisterService<GameSceneManagementService,Type>(typeof(TStartGameScene));
 
             // CommonUpdater
             var commonUpdaterObject = new GameObject(typeof(CommonUpdater).Name);

@@ -14,7 +14,7 @@ using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace ChocolateMint.Scene
 {
-    public class GameSceneTransitionService : ServiceBase, IServiceParameter<Type>
+    public class GameSceneManagementService : ServiceBase, IServiceParameter<Type>
     {
         /// <summary>
         /// 遷移パラメータ
@@ -177,17 +177,26 @@ namespace ChocolateMint.Scene
         /// </summary>
         public override void Update()
         {
-            // 遷移待ちのキューがなければ無視
-            if (!transitionQueueParameters.Any()) { return; }
+            // 現在のシーンの更新処理
+            if (currentActiveScene?.gameScene != null)
+            {
+                currentActiveScene.gameScene.Update();
+            }
 
-            // 遷移中なら無視
-            if (isTransitioning) { return; }
-            
-            isTransitioning = true;
+            var isTransitionable =
+                // 遷移待ちのキューがある
+                transitionQueueParameters.Any() &&
+                // 現在遷移中ではない
+                !isTransitioning;
 
-            // 遷移する
-            var parameter = transitionQueueParameters.Dequeue();
-            TransitionGameSceneInternal(parameter).Forget();
+            if (isTransitionable)
+            {
+                isTransitioning = true;
+
+                // 遷移する
+                var parameter = transitionQueueParameters.Dequeue();
+                TransitionGameSceneInternal(parameter).Forget();
+            }
         }
     }
 }

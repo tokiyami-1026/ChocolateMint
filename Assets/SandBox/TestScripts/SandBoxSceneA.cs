@@ -10,6 +10,11 @@ public class SandBoxSceneA : GameSceneController<DisplayContentModel, SandBoxSce
 
     public override void Terminate()
     {
-        Debug.Log("Terminate");
+        Debug.Log("Terminate A");
+    }
+
+    public override void Update()
+    {
+        Debug.Log("Update A");
     }
 }

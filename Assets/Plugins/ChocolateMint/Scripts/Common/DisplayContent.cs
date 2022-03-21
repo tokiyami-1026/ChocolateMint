@@ -3,7 +3,7 @@
     /// <summary>
     /// 表示物の最基底クラス
     /// </summary>
-    public abstract class DisplayContent
+    public abstract class DisplayContent : IUpdateHandler
     {
         public abstract string ContentAssetPath { get; }
 
@@ -11,6 +11,11 @@
         /// 初期化
         /// </summary>
         public virtual void Initialize() { }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        public virtual void Update() { }
 
         /// <summary>
         /// 終了処理

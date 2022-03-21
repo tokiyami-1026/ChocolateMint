@@ -11,11 +11,16 @@ public class SandBoxSceneB : GameSceneController<SandBoxSceneBModel,SandBoxScene
 
     public void PreInitialize(int sceneParameter)
     {
-        Debug.Log(sceneParameter);
+        Debug.Log($"PreInitialize B : {sceneParameter}");
     }
 
     public override void Initialize()
     {
-        Debug.Log("Initialize");
+        Debug.Log("Initialize B");
+    }
+
+    public override void Update()
+    {
+        Debug.Log("Update B");
     }
 }
