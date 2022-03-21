@@ -11,7 +11,7 @@ public class GameSceneTransitionTest : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             var transitionService = ServiceManager.GetService<GameSceneManagementService>();
-            transitionService.TransitionGameScene<SandBoxSceneB,int>(1234567);
+            transitionService.RequestTransitionGameScene<SandBoxSceneB,int>(1234567);
         }
     }
 }

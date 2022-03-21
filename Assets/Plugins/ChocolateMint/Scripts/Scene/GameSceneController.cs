@@ -1,25 +1,28 @@
 ﻿using ChocolateMint.Common;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace ChocolateMint.Scene
 {
+    /// <summary>
+    /// MVCモデルを実装したゲームシーンクラス
+    /// </summary>
+    /// <typeparam name="TModel">Modelタイプ</typeparam>
+    /// <typeparam name="TView">Viewタイプ</typeparam>
     public abstract class GameSceneController<TModel, TView> : DisplayContentController<TModel, TView>, IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>
         where TModel : DisplayContentModel,new()
         where TView : DisplayContentView
     {
         /// <summary>
-        /// ロードが完了した
+        /// Unityシーンのロードが完了した
         /// </summary>
-        /// <param name="loadResult">ロードが完了したUnityのシーン</param>
+        /// <param name="loadedScene">Unityシーン</param>
+        /// <returns>シーン内のView</returns>
         DisplayContentView IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>.OnLoadedInternal(UnityScene loadedScene)
         {
             Initialize();
-            Model.Initialize();
 
+            // シーン内のオブジェクトにアタッチされているViewを取得する
             var rootObjects = loadedScene.GetRootGameObjects();
             foreach (var root in rootObjects)
             {
@@ -30,6 +33,7 @@ namespace ChocolateMint.Scene
                 }
             }
 
+            // Viewが見つかった
             if (view != null)
             {
                 view.InitializeInternal(MessageBroker);
@@ -37,6 +41,7 @@ namespace ChocolateMint.Scene
 
                 return view;
             }
+            // Viewがなかった
             else
             {
                 throw new Exception("シーン内のViewの取得に失敗しました。");

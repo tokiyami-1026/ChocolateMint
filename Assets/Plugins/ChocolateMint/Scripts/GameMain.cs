@@ -2,8 +2,8 @@
 using ChocolateMint.Service;
 using ChocolateMint.Scene;
 using ChocolateMint.Common;
-using UnityScene = UnityEngine.SceneManagement.Scene;
 using System;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace ChocolateMint
 {
@@ -16,19 +16,19 @@ namespace ChocolateMint
         private CommonUpdater commonUpdater = default;
 
         /// <summary>
-        /// 起動する
+        /// ライブラリを起動する
         /// </summary>
+        /// <typeparam name="TStartGameScene">ゲーム開始時のシーンタイプ</typeparam>
         public void Run<TStartGameScene>()
             where TStartGameScene : DisplayContent, IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>, new()
         {
             // 各種サービスを登録
             ServiceManager.RegisterService<GameSceneManagementService,Type>(typeof(TStartGameScene));
 
-            // CommonUpdater
+            // IUpdateHandlerのUpdate関数を登録
             var commonUpdaterObject = new GameObject(typeof(CommonUpdater).Name);
             commonUpdater = commonUpdaterObject.AddComponent<CommonUpdater>();
             GameObject.DontDestroyOnLoad(commonUpdaterObject);
-
             commonUpdater.AddUpdateHandler(ServiceManager);
         }
 

@@ -2,12 +2,24 @@
 
 namespace ChocolateMint.Service
 {
+    /// <summary>
+    /// サービスのベースクラス
+    /// </summary>
     public abstract class ServiceBase : IUpdateHandler
     {
-        public virtual void Shutdown() { }
+        /// <summary>
+        /// サービスのセットアップ
+        /// </summary>
+        public virtual void Startup() { }
 
+        /// <summary>
+        /// 更新
+        /// </summary>
         public virtual void Update() { }
 
-        public virtual void Startup() { }
+        /// <summary>
+        /// サービスの終了処理
+        /// </summary>
+        public virtual void Shutdown() { }
     }
 }

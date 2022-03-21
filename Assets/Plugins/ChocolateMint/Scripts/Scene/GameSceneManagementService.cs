@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 using ChocolateMint.Service;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using ChocolateMint.Common;
@@ -14,6 +13,9 @@ using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace ChocolateMint.Scene
 {
+    /// <summary>
+    /// シーン全般の管理を行うサービス
+    /// </summary>
     public class GameSceneManagementService : ServiceBase, IServiceParameter<Type>
     {
         /// <summary>
@@ -28,10 +30,10 @@ namespace ChocolateMint.Scene
 
             /// <summary>
             /// パラメータをシーンへ送る関数デリゲート
+            /// </summary>
             /// <remarks>
             /// パラメータなしのシーンの場合はnull
             /// </remarks>
-            /// </summary>
             public Action preInitializeWithSceneParameter;
         }
 
@@ -40,8 +42,14 @@ namespace ChocolateMint.Scene
         /// </summary>
         private class GameSceneSet
         {
+            /// <summary>
+            /// GameScene
+            /// </summary>
             public DisplayContent gameScene;
 
+            /// <summary>
+            /// GameSceneView
+            /// </summary>
             public DisplayContentView gameSceneView;
         }
 
@@ -66,9 +74,9 @@ namespace ChocolateMint.Scene
         private Type startGameSceneType;
 
         /// <summary>
-        /// サービス開始時のパラメータ取得
+        /// サービス登録時のパラメータを受け取る
         /// </summary>
-        /// <param name="parameter">パラメータ</param>
+        /// <param name="startGameSceneType">ゲーム開始時のシーンタイプ</param>
         public void PreStartup(Type startGameSceneType)
         {
             this.startGameSceneType = startGameSceneType;
@@ -82,6 +90,8 @@ namespace ChocolateMint.Scene
             // ゲーム開始時のシーンのインスタンスを作る
             var startGameScene = (DisplayContent)Activator.CreateInstance(startGameSceneType);
             var activeUnityScene = SceneManager.GetActiveScene();
+            
+            // 現在アクティブなシーンとして設定
             currentActiveScene = new GameSceneSet()
             {
                 gameScene = startGameScene,
@@ -90,10 +100,10 @@ namespace ChocolateMint.Scene
         }
 
         /// <summary>
-        /// 指定したシーンへ遷移する
+        /// 指定したシーンへの遷移をリクエストする
         /// </summary>
-        /// <typeparam name="TGameScene">遷移先のシーンタイプ</typeparam>
-        public void TransitionGameScene<TGameScene>() 
+        /// <typeparam name="TGameScene">遷移するシーンタイプ</typeparam>
+        public void RequestTransitionGameScene<TGameScene>() 
             where TGameScene : DisplayContent, IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>, new()
         {
             var parameter = new TransitionParameter()
@@ -104,12 +114,12 @@ namespace ChocolateMint.Scene
         }
 
         /// <summary>
-        /// 指定したシーンへ遷移する（パラメータ付き）
+        /// 指定したシーンへの遷移をリクエストする（シーンへ渡すパラメータも設定できる）
         /// </summary>
-        /// <typeparam name="TGameScene">遷移先のシーンタイプ</typeparam>
-        /// <typeparam name="TSceneParameter">遷移先のシーンに渡すパラメータタイプ</typeparam>
-        /// <param name="sceneParameter">遷移先のシーンに渡すパラメータ</param>
-        public void TransitionGameScene<TGameScene,TSceneParameter>(TSceneParameter sceneParameter) 
+        /// <typeparam name="TGameScene">遷移するシーンタイプ</typeparam>
+        /// <typeparam name="TSceneParameter">シーンに渡すパラメータタイプ</typeparam>
+        /// <param name="sceneParameter">シーンに渡すパラメータ</param>
+        public void RequestTransitionGameScene<TGameScene,TSceneParameter>(TSceneParameter sceneParameter) 
             where TGameScene : DisplayContent, IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>, IGameSceneParameter<TSceneParameter>,new()
         {
             var gameScene = new TGameScene();
@@ -122,11 +132,15 @@ namespace ChocolateMint.Scene
         }
 
         /// <summary>
-        /// 指定したシーンへ遷移する
+        /// 指定したシーンに遷移する
         /// </summary>
+        /// <param name="parameter">遷移パラメータ</param>
         private async UniTask TransitionGameSceneInternal(TransitionParameter parameter)
         {
-            // 遷移開始アニメーション
+            // シーン遷移開始
+            isTransitioning = true;
+
+            // 遷移前のシーンから抜けるときのExitアニメーションを再生する
             var animExit = ((IDisplayContentTransitionAnimation)currentActiveScene.gameSceneView)?.TransitionAnimExit;
             if (animExit != null)
             {
@@ -144,13 +158,15 @@ namespace ChocolateMint.Scene
             // ロード完了
             parameter.preInitializeWithSceneParameter?.Invoke();
             var view = ((IDisplayContentLoadingCallbackReceiverInternal<UnityScene, DisplayContentView>)loadScene).OnLoadedInternal(activeScene);
+            
+            // 現在のアクティブなシーンを設定
             currentActiveScene = new GameSceneSet()
             {
                 gameScene = loadScene,
                 gameSceneView = view,
             };
 
-            // 遷移終了アニメーション
+            // 遷移してきたシーンのEnterアニメーションを再生
             var enterAnim = ((IDisplayContentTransitionAnimation)currentActiveScene.gameSceneView)?.TransitionAnimEnter;
             if (enterAnim != null)
             {
@@ -158,6 +174,7 @@ namespace ChocolateMint.Scene
                 enterAnim.gameObject.SetActive(false);
             }
 
+            // シーン遷移終了
             isTransitioning = false;
         }
 
@@ -191,8 +208,6 @@ namespace ChocolateMint.Scene
 
             if (isTransitionable)
             {
-                isTransitioning = true;
-
                 // 遷移する
                 var parameter = transitionQueueParameters.Dequeue();
                 TransitionGameSceneInternal(parameter).Forget();
